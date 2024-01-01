@@ -1,4 +1,4 @@
-FROM python:2.7
+FROM python:3.7
 
 COPY --from=openjdk:8-jre-slim /usr/local/openjdk-8 /usr/local/openjdk-8
 
@@ -16,7 +16,7 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-COPY ./data/2019-20_pbp.csv /
+COPY ./data/2019-20_pbp.csv /data
 
 
 CMD ["python", "spark.py"]

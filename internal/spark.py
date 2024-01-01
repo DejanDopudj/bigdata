@@ -19,8 +19,8 @@ class BatchJob:
         csv_reader = csv.reader("./data/2019-20_pbp.csv")
         i = 0
         df = self.spark.read.csv("./data/2019-20_pbp.csv", header=True, inferSchema=True)
-        self.write_parquet(df, "./processed/test/asdf.parquet")
-        read_df = self.read_parquet("./processed/test/asdf.parquet")
+        self.write_parquet(df, "./processed/test/data/2019-20_pbp.parquet")
+        read_df = self.read_parquet("./processed/test/data/2019-20_pbp.parquet")
         read_df.show(truncate=False, vertical=True)
         self.transform1()
 
@@ -32,14 +32,14 @@ class BatchJob:
         return df
 
     def transform1(self):
-        df = self.read_parquet("./processed/test/asdf.parquet")
+        df = self.read_parquet("./processed/test/data/2019-20_pbp.parquet")
         res = (
             df.filter(col("Rebounder").isNotNull())
             .groupBy("Rebounder", "ReboundType")
             .count()
         )
         res.show()
-        self.write_parquet(res, "./processed/test/res.parquet")
+        self.write_parquet(res, "./processed/test/data/2019-20_rebounds.parquet")
 
 job = BatchJob()
 job.run()
