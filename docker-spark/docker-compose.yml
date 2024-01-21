@@ -1,27 +1,27 @@
 version: '2'
 services:
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - 22181:2181
+  # zookeeper:
+  #   image: confluentinc/cp-zookeeper:latest
+  #   environment:
+  #     ZOOKEEPER_CLIENT_PORT: 2181
+  #     ZOOKEEPER_TICK_TIME: 2000
+  #   ports:
+  #     - 22181:2181
   
-  kafka:
-    image: confluentinc/cp-kafka:latest
-    depends_on:
-      - zookeeper
-    ports:
-      - 29092:29092
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  # kafka:
+  #   image: confluentinc/cp-kafka:latest
+  #   depends_on:
+  #     - zookeeper
+  #   ports:
+  #     - 29092:29092
+  #   environment:
+  #     KAFKA_BROKER_ID: 1
+  #     KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+  #     KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
   
   
   namenode:
@@ -52,7 +52,7 @@ services:
       - ./hadoop.env
 
   spark-master:
-    image: bde2020/spark-master:3.2.1-hadoop3.2
+    image: bde2020/spark-master:3.3.0-hadoop3.3
     container_name: spark-master
     depends_on:
       - namenode
@@ -64,13 +64,12 @@ services:
       - PYSPARK_PYTHON=python3
       - INIT_DAEMON_STEP=setup_spark
       - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
-    env_file:
-      - ./hadoop.env
     volumes: 
       - ../internal/data:/data:rw
+      - ./spark-warehouse:/spark-warehouse
       
   spark-worker1:
-    image: bde2020/spark-worker:3.2.1-hadoop3.2
+    image: bde2020/spark-worker:3.3.0-hadoop3.3
     container_name: spark-worker1
     depends_on:
       - spark-master
@@ -81,13 +80,12 @@ services:
       - SPARK_WORKER_CORES = 4
     ports:
       - 8081:8081
-    env_file:
-      - ./hadoop.env
     volumes: 
       - ../internal/data:/data:rw
+      - ./spark-warehouse:/spark-warehouse
   
   spark-worker2:
-    image: bde2020/spark-worker:3.2.1-hadoop3.2
+    image: bde2020/spark-worker:3.3.0-hadoop3.3
     container_name: spark-worker2
     depends_on:
       - spark-master
@@ -98,10 +96,9 @@ services:
       - SPARK_WORKER_CORES = 4
     ports:
       - 8082:8082
-    env_file:
-      - ./hadoop.env
     volumes: 
       - ../internal/data:/data:rw
+      - ./spark-warehouse:/spark-warehouse
 
   
   hive-server:
@@ -132,45 +129,45 @@ services:
     image: bde2020/hive-metastore-postgresql:2.3.0
     container_name: hive-metastore-postgresql
 
-  cloudera:
-    image: gethue/hue:20201111-135001
-    container_name: hue
-    dns: 8.8.8.8
-    ports:
-      - "8888:8888"
-    volumes:
-      - ./conf.dist:/usr/share/hue/desktop/conf
-    depends_on: 
-      - hive-server
+  # cloudera:
+  #   image: gethue/hue:20201111-135001
+  #   container_name: hue
+  #   dns: 8.8.8.8
+  #   ports:
+  #     - "8888:8888"
+  #   volumes:
+  #     - ./conf.dist:/usr/share/hue/desktop/conf
+  #   depends_on: 
+  #     - hive-server
 
-  resourcemanager:
-    image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
-    container_name: resourcemanager
-    restart: always
-    environment:
-      SERVICE_PRECONDITION: "namenode:9000 datanode:9864"
-    env_file:
-      - ./hadoop.env
+  # resourcemanager:
+  #   image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
+  #   container_name: resourcemanager
+  #   restart: always
+  #   environment:
+  #     SERVICE_PRECONDITION: "namenode:9000 datanode:9864"
+  #   env_file:
+  #     - ./hadoop.env
 
-  nodemanager1:
-    image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
-    container_name: nodemanager
-    restart: always
-    environment:
-      SERVICE_PRECONDITION: "namenode:9000 datanode:9864 resourcemanager:8088"
-    env_file:
-      - ./hadoop.env
+  # nodemanager1:
+  #   image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
+  #   container_name: nodemanager
+  #   restart: always
+  #   environment:
+  #     SERVICE_PRECONDITION: "namenode:9000 datanode:9864 resourcemanager:8088"
+  #   env_file:
+  #     - ./hadoop.env
 
-  historyserver:
-    image: bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8
-    container_name: historyserver
-    restart: always
-    environment:
-      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
-    volumes:
-      - hadoop_historyserver:/hadoop/yarn/timeline
-    env_file:
-      - ./hadoop.env
+  # historyserver:
+  #   image: bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8
+  #   container_name: historyserver
+  #   restart: always
+  #   environment:
+  #     SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
+  #   volumes:
+  #     - hadoop_historyserver:/hadoop/yarn/timeline
+  #   env_file:
+  #     - ./hadoop.env
 
   my:
     build: ../internal
@@ -180,11 +177,10 @@ services:
       - spark-worker2
     hostname: test
     volumes: 
-      - processed:/processed
+      - ./spark-warehouse:/spark-warehouse
     container_name: test
 
 volumes:
   hadoop_namenode:
   hadoop_datanode:
   hadoop_historyserver:
-  processed:
