@@ -16,7 +16,7 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-COPY ./data/2019-20_pbp.csv /data
+COPY ./data /data
 
 
 CMD ["python", "spark.py"]
