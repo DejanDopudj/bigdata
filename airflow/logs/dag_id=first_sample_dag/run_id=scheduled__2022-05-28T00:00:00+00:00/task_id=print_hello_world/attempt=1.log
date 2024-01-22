@@ -1,0 +1,51 @@
+[2024-01-22T18:44:30.559+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: first_sample_dag.print_hello_world scheduled__2022-05-28T00:00:00+00:00 [queued]>
+[2024-01-22T18:44:30.589+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: first_sample_dag.print_hello_world scheduled__2022-05-28T00:00:00+00:00 [queued]>
+[2024-01-22T18:44:30.592+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 1
+[2024-01-22T18:44:30.642+0000] {taskinstance.py:2191} INFO - Executing <Task(BashOperator): print_hello_world> on 2022-05-28 00:00:00+00:00
+[2024-01-22T18:44:30.692+0000] {standard_task_runner.py:60} INFO - Started process 129 to run task
+[2024-01-22T18:44:30.739+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'first_sample_dag', 'print_hello_world', 'scheduled__2022-05-28T00:00:00+00:00', '--job-id', '3', '--raw', '--subdir', 'DAGS_FOLDER/sample_dag.py', '--cfg-path', '/tmp/tmpvdk2ok9l']
+[2024-01-22T18:44:30.768+0000] {standard_task_runner.py:88} INFO - Job 3: Subtask print_hello_world
+[2024-01-22T18:44:31.062+0000] {task_command.py:423} INFO - Running <TaskInstance: first_sample_dag.print_hello_world scheduled__2022-05-28T00:00:00+00:00 [running]> on host 628e1efc02d7
+[2024-01-22T18:44:31.291+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='first_sample_dag' AIRFLOW_CTX_TASK_ID='print_hello_world' AIRFLOW_CTX_EXECUTION_DATE='2022-05-28T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2022-05-28T00:00:00+00:00'
+[2024-01-22T18:44:31.294+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2024-01-22T18:44:31.304+0000] {subprocess.py:75} INFO - Running command: ['/usr/bin/bash', '-c', 'echo "HelloWorld!"']
+[2024-01-22T18:44:31.388+0000] {subprocess.py:86} INFO - Output:
+[2024-01-22T18:44:31.392+0000] {subprocess.py:93} INFO - HelloWorld!
+[2024-01-22T18:44:31.408+0000] {subprocess.py:97} INFO - Command exited with return code 0
+[2024-01-22T18:44:31.482+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=first_sample_dag, task_id=print_hello_world, execution_date=20220528T000000, start_date=20240122T184430, end_date=20240122T184431
+[2024-01-22T18:44:31.567+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2024-01-22T18:44:31.599+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2024-01-22T20:24:50.155+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: first_sample_dag.print_hello_world scheduled__2022-05-28T00:00:00+00:00 [queued]>
+[2024-01-22T20:24:50.174+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: first_sample_dag.print_hello_world scheduled__2022-05-28T00:00:00+00:00 [queued]>
+[2024-01-22T20:24:50.175+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 1
+[2024-01-22T20:24:50.197+0000] {taskinstance.py:2191} INFO - Executing <Task(BashOperator): print_hello_world> on 2022-05-28 00:00:00+00:00
+[2024-01-22T20:24:50.208+0000] {standard_task_runner.py:60} INFO - Started process 218 to run task
+[2024-01-22T20:24:50.232+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'first_sample_dag', 'print_hello_world', 'scheduled__2022-05-28T00:00:00+00:00', '--job-id', '4', '--raw', '--subdir', 'DAGS_FOLDER/sample_dag.py', '--cfg-path', '/tmp/tmprl2_8nno']
+[2024-01-22T20:24:50.245+0000] {standard_task_runner.py:88} INFO - Job 4: Subtask print_hello_world
+[2024-01-22T20:24:51.085+0000] {task_command.py:423} INFO - Running <TaskInstance: first_sample_dag.print_hello_world scheduled__2022-05-28T00:00:00+00:00 [running]> on host 8b57cbef3a15
+[2024-01-22T20:24:51.258+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='first_sample_dag' AIRFLOW_CTX_TASK_ID='print_hello_world' AIRFLOW_CTX_EXECUTION_DATE='2022-05-28T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2022-05-28T00:00:00+00:00'
+[2024-01-22T20:24:51.286+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2024-01-22T20:24:51.287+0000] {subprocess.py:75} INFO - Running command: ['/usr/bin/bash', '-c', 'echo "HelloWorld!"']
+[2024-01-22T20:24:51.348+0000] {subprocess.py:86} INFO - Output:
+[2024-01-22T20:24:51.454+0000] {subprocess.py:93} INFO - HelloWorld!
+[2024-01-22T20:24:51.458+0000] {subprocess.py:97} INFO - Command exited with return code 0
+[2024-01-22T20:24:51.513+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=first_sample_dag, task_id=print_hello_world, execution_date=20220528T000000, start_date=20240122T202450, end_date=20240122T202451
+[2024-01-22T20:24:51.545+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2024-01-22T20:24:51.580+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2024-01-22T20:51:38.510+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: first_sample_dag.print_hello_world scheduled__2022-05-28T00:00:00+00:00 [queued]>
+[2024-01-22T20:51:38.529+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: first_sample_dag.print_hello_world scheduled__2022-05-28T00:00:00+00:00 [queued]>
+[2024-01-22T20:51:38.532+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 1
+[2024-01-22T20:51:38.547+0000] {taskinstance.py:2191} INFO - Executing <Task(BashOperator): print_hello_world> on 2022-05-28 00:00:00+00:00
+[2024-01-22T20:51:38.555+0000] {standard_task_runner.py:60} INFO - Started process 71 to run task
+[2024-01-22T20:51:38.560+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'first_sample_dag', 'print_hello_world', 'scheduled__2022-05-28T00:00:00+00:00', '--job-id', '4', '--raw', '--subdir', 'DAGS_FOLDER/sample_dag.py', '--cfg-path', '/tmp/tmpv35nx1xc']
+[2024-01-22T20:51:38.563+0000] {standard_task_runner.py:88} INFO - Job 4: Subtask print_hello_world
+[2024-01-22T20:51:38.656+0000] {task_command.py:423} INFO - Running <TaskInstance: first_sample_dag.print_hello_world scheduled__2022-05-28T00:00:00+00:00 [running]> on host b8b2a6e5721a
+[2024-01-22T20:51:38.754+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='first_sample_dag' AIRFLOW_CTX_TASK_ID='print_hello_world' AIRFLOW_CTX_EXECUTION_DATE='2022-05-28T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2022-05-28T00:00:00+00:00'
+[2024-01-22T20:51:38.759+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2024-01-22T20:51:38.760+0000] {subprocess.py:75} INFO - Running command: ['/usr/bin/bash', '-c', 'echo "HelloWorld!"']
+[2024-01-22T20:51:38.777+0000] {subprocess.py:86} INFO - Output:
+[2024-01-22T20:51:38.790+0000] {subprocess.py:93} INFO - HelloWorld!
+[2024-01-22T20:51:38.792+0000] {subprocess.py:97} INFO - Command exited with return code 0
+[2024-01-22T20:51:38.827+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=first_sample_dag, task_id=print_hello_world, execution_date=20220528T000000, start_date=20240122T205138, end_date=20240122T205138
+[2024-01-22T20:51:38.867+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2024-01-22T20:51:38.881+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check

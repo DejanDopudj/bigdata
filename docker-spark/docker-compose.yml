@@ -170,7 +170,7 @@ services:
   #     - ./hadoop.env
 
   my:
-    build: ../internal
+    build: ./airflow/dags
     depends_on:
       - spark-master
       - spark-worker1

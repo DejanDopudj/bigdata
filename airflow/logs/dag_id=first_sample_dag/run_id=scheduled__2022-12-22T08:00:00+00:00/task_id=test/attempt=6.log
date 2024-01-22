@@ -1,0 +1,34 @@
+[2024-01-22T20:43:41.423+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: first_sample_dag.test scheduled__2022-12-22T08:00:00+00:00 [queued]>
+[2024-01-22T20:43:41.428+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: first_sample_dag.test scheduled__2022-12-22T08:00:00+00:00 [queued]>
+[2024-01-22T20:43:41.428+0000] {taskinstance.py:2170} INFO - Starting attempt 6 of 6
+[2024-01-22T20:43:41.434+0000] {taskinstance.py:2191} INFO - Executing <Task(_PythonDecoratedOperator): test> on 2022-12-22 08:00:00+00:00
+[2024-01-22T20:43:41.441+0000] {standard_task_runner.py:60} INFO - Started process 50 to run task
+[2024-01-22T20:43:41.444+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'first_sample_dag', 'test', 'scheduled__2022-12-22T08:00:00+00:00', '--job-id', '18', '--raw', '--subdir', 'DAGS_FOLDER/sample_dag.py', '--cfg-path', '/tmp/tmp7f2eyyyk']
+[2024-01-22T20:43:41.446+0000] {standard_task_runner.py:88} INFO - Job 18: Subtask test
+[2024-01-22T20:43:41.486+0000] {task_command.py:423} INFO - Running <TaskInstance: first_sample_dag.test scheduled__2022-12-22T08:00:00+00:00 [running]> on host 8b57cbef3a15
+[2024-01-22T20:43:41.580+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='first_sample_dag' AIRFLOW_CTX_TASK_ID='test' AIRFLOW_CTX_EXECUTION_DATE='2022-12-22T08:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='6' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2022-12-22T08:00:00+00:00'
+[2024-01-22T20:43:57.110+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/decorators/base.py", line 241, in execute
+    return_value = super().execute(context)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/sample_dag.py", line 13, in test
+    job.daily_ingest(f"01-03-2017", f"2017-03-01")
+  File "/opt/airflow/plugins/lib/spark.py", line 68, in daily_ingest
+    self.spark.sql(f"CREATE SCHEMA IF NOT EXISTS nba_raw")
+  File "/home/airflow/.local/lib/python3.8/site-packages/pyspark/sql/session.py", line 1034, in sql
+    return DataFrame(self._jsparkSession.sql(sqlQuery), self)
+  File "/home/airflow/.local/lib/python3.8/site-packages/py4j/java_gateway.py", line 1321, in __call__
+    return_value = get_return_value(
+  File "/home/airflow/.local/lib/python3.8/site-packages/pyspark/sql/utils.py", line 196, in deco
+    raise converted from None
+pyspark.sql.utils.AnalysisException: org.apache.hadoop.hive.ql.metadata.HiveException: java.lang.RuntimeException: Unable to instantiate org.apache.hadoop.hive.ql.metadata.SessionHiveMetaStoreClient
+[2024-01-22T20:43:57.238+0000] {taskinstance.py:1138} INFO - Marking task as FAILED. dag_id=first_sample_dag, task_id=test, execution_date=20221222T080000, start_date=20240122T204341, end_date=20240122T204357
+[2024-01-22T20:43:57.351+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 18 for task test (org.apache.hadoop.hive.ql.metadata.HiveException: java.lang.RuntimeException: Unable to instantiate org.apache.hadoop.hive.ql.metadata.SessionHiveMetaStoreClient; 50)
+[2024-01-22T20:43:57.394+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2024-01-22T20:43:57.435+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check

@@ -34,13 +34,13 @@ class BatchJob:
         # self.spark.sql(f"DROP TABLE IF EXISTS nba_core.play_by_play")
 
         # for i in range (1,6):
-        # self.daily_ingest(f"01-02-2017", f"2017-02-01")
+        # self.daily_ingest(f"01-03-2017", f"2017-03-01")
         # self.daily_ingest(f"01-06-2017", f"2017-06-01")
         # self.staging_ingest(f"2017-04-01")
-        # print("PPP")
+        print("PPP")
         # self.calculate()
         # self.points_per_player()
-        self.points_per_game()
+        # self.points_per_game()
         # self.spark.sql(f"CREATE SCHEMA IF NOT EXISTS primerBaze2")
         # df = self.spark.read.format("csv").option("mode", "PERMISSIVE").load("./data/2019-20_pbp.csv")
         # df = self.spark.read.csv("./data/2019-20_pbp.csv", header=True, inferSchema=True)
@@ -68,12 +68,13 @@ class BatchJob:
         self.spark.sql(f"CREATE SCHEMA IF NOT EXISTS nba_raw")
         self.drop_partition("nba_raw", "play_by_play", "Date", date2)
         print("1")
-        df = self.spark.read.csv(f"./data/{date}-pbp.csv", header=True, inferSchema=True)
+        df = self.spark.read.csv(f"./airflow/data/{date}-pbp.csv", header=True, inferSchema=True)
         print("2")
         df.write.format("delta") \
         .saveAsTable("nba_raw.play_by_play", partitionBy="Date", mode="append")
         print("3")
-        self.staging_ingest(date2)
+        df.show()
+        # self.staging_ingest(date2)
 
         
     def staging_ingest(self, date):
@@ -138,5 +139,7 @@ class BatchJob:
         .orderBy(col("AveragePointsPerGame").desc())
         average_stats_df.show()
 
-job = BatchJob()
-job.run()
+# job = BatchJob()
+# job.run()
+def test():
+    print
