@@ -1,3 +1,6 @@
 /data
 /docker-spark/spark-warehouse
 /internal/data
+*.jar
+*.tgz
+/airflow/logs

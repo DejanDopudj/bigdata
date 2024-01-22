@@ -1,4 +1,10 @@
 version: '2'
+
+networks:
+  airflow_network:
+    name: airflow_network
+    external: true
+    
 services:
 
   # zookeeper:
@@ -35,6 +41,8 @@ services:
       - ./hadoop.env
     ports:
       - 9000:9000
+    networks:
+      - airflow_network
 
   datanode:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
@@ -50,6 +58,8 @@ services:
       - "9864:9864"
     env_file:
       - ./hadoop.env
+    networks:
+      - airflow_network
 
   spark-master:
     image: bde2020/spark-master:3.3.0-hadoop3.3
@@ -58,7 +68,7 @@ services:
       - namenode
       - datanode
     ports:
-      - 8080:8080
+      - 8090:8090
       - 7077:7077
     environment: 
       - PYSPARK_PYTHON=python3
@@ -67,6 +77,9 @@ services:
     volumes: 
       - ../internal/data:/data:rw
       - ./spark-warehouse:/spark-warehouse
+      - ./resources:/usr/local/spark/resources #Resources folder (Must be the same path in airflow and Spark Cluster)
+    networks:
+      - airflow_network
       
   spark-worker1:
     image: bde2020/spark-worker:3.3.0-hadoop3.3
@@ -83,6 +96,9 @@ services:
     volumes: 
       - ../internal/data:/data:rw
       - ./spark-warehouse:/spark-warehouse
+      - ./resources:/usr/local/spark/resources #Resources folder (Must be the same path in airflow and Spark Cluster)
+    networks:
+      - airflow_network
   
   spark-worker2:
     image: bde2020/spark-worker:3.3.0-hadoop3.3
@@ -99,6 +115,9 @@ services:
     volumes: 
       - ../internal/data:/data:rw
       - ./spark-warehouse:/spark-warehouse
+      - ./resources:/usr/local/spark/resources #Resources folder (Must be the same path in airflow and Spark Cluster)
+    networks:
+      - airflow_network
 
   
   hive-server:
@@ -113,6 +132,8 @@ services:
       SERVICE_PRECONDITION: "hive-metastore:9083"
     ports:
       - "10000:10000"
+    networks:
+      - airflow_network
   
   hive-metastore:
     image: bde2020/hive:2.3.2-postgresql-metastore
@@ -124,10 +145,14 @@ services:
       SERVICE_PRECONDITION: "namenode:9000 datanode:9864 hive-metastore-postgresql:5432"
     ports:
       - "9083:9083"
+    networks:
+      - airflow_network
   
   hive-metastore-postgresql:
     image: bde2020/hive-metastore-postgresql:2.3.0
     container_name: hive-metastore-postgresql
+    networks:
+      - airflow_network
 
   # cloudera:
   #   image: gethue/hue:20201111-135001
@@ -179,6 +204,8 @@ services:
     volumes: 
       - ./spark-warehouse:/spark-warehouse
     container_name: test
+    networks:
+      - airflow_network
 
 volumes:
   hadoop_namenode:
