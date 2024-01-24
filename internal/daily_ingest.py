@@ -19,18 +19,11 @@ import sys
 
 
 def daily_ingest(ds):
-    # print(ds)
-    # context = get_current_context()
-    # date = context["execution_date"]
-    print("AAA")
     date_str = convert_to_date(ds)
-    print(date_str)
-    print("AAA")
     date="01-03-2017"
-    print("Daily ingest")
-    return
     job = BatchJob()
     # self.drop_partition("nba_raw", "play_by_play", "Date", date2)
+    # path = f"hdfs://namenode:9000/data-warehouse/{date}-pbp.csv"
     path = f"/user/local/spark/app/data/{date}-pbp.csv"
     with open(path, newline="\n") as csvfile:
         spamreader = csv.reader(csvfile, delimiter=",", quotechar="|")
