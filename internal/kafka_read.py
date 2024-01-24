@@ -1,41 +1,54 @@
-from confluent_kafka import Consumer, KafkaError
+from pyspark.sql import SparkSession
+from pyspark.sql import Row
+from pyspark.sql.functions import (
+    col,
+    regexp_extract,
+    when,
+    sum,
+    concat_ws,
+    year,
+    month,
+    count,
+    avg,
+    from_json
+)
+import csv
+from spark import BatchJob
+from util import read_from_db, write_to_db, convert_to_date
+from airflow.operators.python import get_current_context
+import sys
+from pyspark.sql.types import StructType, StructField, StringType
 
-def consume_from_kafka(bootstrap_servers, group_id, topic):
-    consumer_conf = {
-        'bootstrap.servers': bootstrap_servers,
-        'group.id': group_id,
-        'auto.offset.reset': 'earliest'  
-    }
+schema = StructType([
+    StructField("session_id", StringType(), True),
+    StructField("name", StringType(), True),
+    StructField("event_date_time", StringType(), True),
+    StructField("country_id", StringType(), True),
+    StructField("product_id", StringType(), True),
+    StructField("user_id", StringType(), True)
+])
 
-    consumer = Consumer(consumer_conf)
+def kafka_read(ds):
+    date_str = convert_to_date(ds)
+    date="01-03-2017"
+    job = BatchJob()
+    df = job.spark\
+      .readStream \
+      .format("kafka") \
+      .option("kafka.bootstrap.servers", "kafka:9092") \
+      .option("subscribe", "test") \
+      .option("startingOffsets", "earliest") \
+      .load()\
+      .select(from_json(col("value").cast("string"), schema).alias("parsed_value"))\
+      .select(col("parsed_value.*"))
 
-    consumer.subscribe([topic])
+    query = df.selectExpr("*") \
+        .writeStream \
+        .format("console") \
+        .option("checkpointLocation", "hdfs://namenode:9000/checkpoint") \
+        .start()
 
-    try:
-        while True:
-            # Poll for messages
-            msg = consumer.poll(timeout=1000) 
-
-            if msg is None:
-                continue
-            if msg.error():
-                if msg.error().code() == KafkaError._PARTITION_EOF:
-                    continue
-                else:
-                    print('Error: {}'.format(msg.error()))
-                    break
-
-            print('Received message: {}'.format(msg.value().decode('utf-8')))
-
-    except KeyboardInterrupt:
-        pass
-
-    finally:
-        consumer.close()
-
-if __name__ == '__main__':
-    bootstrap_servers = '127.0.0.1:29092' 
-    consumer_group_id = 'my-consumer-group'  
-    kafka_topic = 'topic'  
-
-    consume_from_kafka(bootstrap_servers, consumer_group_id, kafka_topic)
+    query.awaitTermination()
+ 
+execution_date = sys.argv[1]
+kafka_read(execution_date)

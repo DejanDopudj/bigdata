@@ -11,4 +11,4 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Command to run your Python script
-CMD ["python", "kafka_write.py"]
+CMD ["python", "skripta.py"]
