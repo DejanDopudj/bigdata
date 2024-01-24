@@ -1,4 +1,4 @@
-FROM apache/airflow:2.7.2-python3.8
+FROM apache/airflow:2.6.3-python3.7
 
 USER root
 
@@ -16,8 +16,11 @@ RUN rm /opt/spark/spark-3.3.0-bin-hadoop3.tgz
 ENV SPARK_HOME /opt/spark
 RUN export SPARK_HOME
 RUN export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
-
+RUN apt-get update \
+    && apt-get -y install libpq-dev gcc
 USER airflow
+
+RUN pip install psycopg2
 
 COPY requirements.txt .
 

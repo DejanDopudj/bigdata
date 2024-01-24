@@ -193,21 +193,44 @@ services:
   #     - hadoop_historyserver:/hadoop/yarn/timeline
   #   env_file:
   #     - ./hadoop.env
-
-  my:
-    build: ../internal
-    depends_on:
-      - spark-master
-      - spark-worker1
-      - spark-worker2
-    hostname: test
-    volumes: 
-      - ./spark-warehouse:/spark-warehouse
-    container_name: test
+  mongo:
+    image: mongo:5
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_DATABASE: test
+      MONGODB_DB: test
+      MONGODB_USER: test
+      MONGODB_PASSWORD: test
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
     networks:
       - airflow_network
 
+  metabase:
+    image: metabase/metabase
+    ports:
+      - 3000:3000
+    networks:
+      - airflow_network
+
+  # my:
+  #   build: ../internal
+  #   depends_on:
+  #     - spark-master
+  #     - spark-worker1
+  #     - spark-worker2
+  #   hostname: test
+  #   volumes: 
+  #     - ./spark-warehouse:/spark-warehouse
+  #   container_name: test
+  #   networks:
+  #     - airflow_network
+  
 volumes:
   hadoop_namenode:
   hadoop_datanode:
   hadoop_historyserver:
+  mongodb_data_container:

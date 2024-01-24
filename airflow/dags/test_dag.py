@@ -7,14 +7,14 @@ from airflow.decorators import task
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 
 spark_master = "spark://spark:7077"
-jar1 = '/usr/local/spark/resources/delta-core_2.12-2.2.0.jar'
+jar1 = '/usr/local/spark/resources/mongo-spark-connector_2.12-10.2.1-all.jar'
 jar2 = '/usr/local/spark/resources/spark-avro_2.12-3.3.0.jar'
 jar3 = '/usr/local/spark/resources/spark-sql-kafka-0-10_2.12-3.3.0.jar'
 
 with DAG(
     dag_id='first_sample_dag',
     start_date=datetime(2022, 5, 28),
-    schedule_interval= dt.timedelta(minutes=300000)
+    schedule_interval= dt.timedelta(minutes=400000)
 ) as dag:
     start_task = EmptyOperator(
         task_id='start'
