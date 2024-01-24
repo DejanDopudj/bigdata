@@ -68,7 +68,7 @@ class BatchJob:
             "collection", collection
         ).save()
 
-    def run(self):
+    # def run(self):
         # self.example_read()
         # self.points_per_player()
         # self.spark.sql(f"DROP TABLE IF EXISTS nba_raw.play_by_play")
@@ -76,7 +76,7 @@ class BatchJob:
         # self.spark.sql(f"DROP TABLE IF EXISTS nba_core.play_by_play")
 
         # for i in range (1,6):
-        self.daily_ingest(f"01-02-2017", f"2017-02-01")
+        # self.daily_ingest(f"01-02-2017", f"2017-02-01")
         # self.daily_ingest(f"01-06-2017", f"2017-06-01")
         # self.staging_ingest(f"2017-04-01")
         # print("PPPD")
@@ -123,47 +123,6 @@ class BatchJob:
             .count()
         )
         res.show()
-
-    def daily_ingest(self, date, date2):
-        # try:
-        #     print("1print")
-        #     self.spark.sql(f"CREATE SCHEMA IF NOT EXISTS nba_raw")
-        #     print("2print")
-        #     self.spark.sql(f"CREATE TABLE IF NOT EXISTS nba_raw.test2 (id INT,number INT)")
-        #     print("3print")
-        #     # self.spark.sql(f"INSERT INTO nba_raw.test2 (id, number) VALUES(1, 100)")
-        #     print("4print")
-        #     print(self.spark.sql(f"SELECT * FROM nba_raw.test2"))
-        #     # return
-        # except:
-        #     print("testasdf")
-        # self.drop_partition("nba_raw", "play_by_play", "Date", date2)
-        # print("1print")
-        path = f"/user/local/spark/app/data/{date}-pbp.csv"
-        with open(path, newline="\n") as csvfile:
-            spamreader = csv.reader(csvfile, delimiter=",", quotechar="|")
-            i = 0
-            rows = []
-            for row in spamreader:
-                rows.append(row)
-                i += 1
-                if i == 15:
-                    break
-        columns = rows[0]
-        data_rows = [Row(**dict(zip(columns, values))) for values in rows[1:]]
-        df = self.spark.createDataFrame(data_rows)
-        self.write_mongodb(df, "test2", "test3")
-        df2 = self.read_mongodb("test2", "test3")
-        df2.show()
-        # print(rows)
-        # print("1.5print")
-        # # df = self.spark.read.option("inferSchema", "true").option("header", "true").option("delimiter", ' ').csv(f'./data/{date}-pbp.csv')
-        # print("2print")
-        # df.write.format("delta") \
-        # .saveAsTable("nba_raw.play_by_play", partitionBy="Date", mode="append")
-        # print("3print")
-        # df.show()
-        # self.staging_ingest(date2)
 
     def staging_ingest(self, date):
         self.spark.sql(f"CREATE SCHEMA IF NOT EXISTS nba_staging")
@@ -244,5 +203,5 @@ class BatchJob:
         average_stats_df.show()
 
 
-job = BatchJob()
-job.run()
+# job = BatchJob()
+# job.run()
