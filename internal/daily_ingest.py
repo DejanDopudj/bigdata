@@ -32,8 +32,6 @@ def daily_ingest(ds):
         for row in spamreader:
             rows.append(row)
             i += 1
-            if i == 470:
-                break
     columns = rows[0]
     data_rows = [Row(**dict(zip(columns, values))) for values in rows[1:]]
     df = job.spark.createDataFrame(data_rows)

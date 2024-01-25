@@ -27,9 +27,9 @@ def first_points_per_game():
     df = read_from_db(job.spark, "nba_test_staging", "play_by_play")
     made_shots_CTE = (
         df.select(col("Shooter"), col("ShotType"), col("URL"), col("HomeScore"), col("AwayScore"))
-        .filter(col("Shooter") != '' & (col("ShotOutcome") == "make"))
+        .filter((col("Shooter") != '') & (col("ShotOutcome") == "make"))
     )
-    ranked_players_CTE = (
+    ranked_players_CTE = ( # u jos bar dva upita
          made_shots_CTE.select(col("Shooter"), col("ShotType"), row_number().over(Window.partitionBy("URL").orderBy(["HomeScore", "AwayScore"])).alias("Rank"))
          .orderBy(col("Rank").asc())
     )

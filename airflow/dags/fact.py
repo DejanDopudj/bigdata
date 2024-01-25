@@ -13,7 +13,7 @@ jar2 = '/usr/local/spark/resources/spark-avro_2.12-3.3.0.jar'
 jar3 = '/usr/local/spark/resources/spark-sql-kafka-0-10_2.12-3.3.0.jar'
 
 with DAG(
-    'fact_dag',
+    'transformations_dag',
     start_date=datetime(2022, 5, 28),
     schedule_interval= dt.timedelta(minutes=400000)
 ) as dag:
@@ -33,6 +33,13 @@ with DAG(
         task_id='points_per_player',
         conn_id="spark_default",
         application='/user/local/spark/app/points_per_player.py',
+        conf={"spark.master":spark_master},
+        jars=jar1+","+jar2+","+jar3,
+    )
+    points_per_player_7 = SparkSubmitOperator(
+        task_id='points_per_player_last_7',
+        conn_id="spark_default",
+        application='/user/local/spark/app/points_per_player_last_7_days.py',
         conf={"spark.master":spark_master},
         jars=jar1+","+jar2+","+jar3,
     )
@@ -92,8 +99,17 @@ with DAG(
         conf={"spark.master":spark_master},
         jars=jar1+","+jar2+","+jar3,
     )
+    ft_percentage_after_make = SparkSubmitOperator(
+        task_id='ft_percentage_after_make',
+        conn_id="spark_default",
+        application='/user/local/spark/app/ft_shot_percentage_after_make.py',
+        conf={"spark.master":spark_master},
+        jars=jar1+","+jar2+","+jar3,
+    )
     
 
-wait_for_raw_ingestion >> [start_task >> points_per_player >> rebounds_per_player >> assists_per_player >> stats_per_game >> 
+wait_for_raw_ingestion >> [start_task >> points_per_player >> points_per_player_7 >> rebounds_per_player >> 
+                           assists_per_player >> stats_per_game >> 
                            first_points_per_game >> percentage_of_points_per_quarter_per_team_per_game >>
-                             scores >> seasonal_points_per_quarter >>  steals_between_players >> end_task]
+                             scores >> seasonal_points_per_quarter >> steals_between_players >>
+                               ft_percentage_after_make >> end_task]

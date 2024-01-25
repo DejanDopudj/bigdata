@@ -19,43 +19,54 @@ import sys
 
 def points_per_player():
     job = BatchJob()
-    df = read_from_db(job.spark,"nba_test_core", "points_per_player")
-    df.show()
     # drop_partition(job.spark,"nba_test_core", "points_per_player")
-    df = read_from_db(job.spark, "nba_test_staging", "play_by_play")
+    df = read_from_db(job.spark, "nba_test_fact", "play_by_play")
+    dimension_player = read_from_db(job.spark, "nba_test_fact", "dimension_player")
+    dimension_shot_type = read_from_db(job.spark, "nba_test_fact", "dimension_shot_type")
+    
+    joined_df = df.join(dimension_player, df['Shooter'] == dimension_player['player_id'], 'inner')
+
+
+    # Joining the result with dimension_type_id on 'shot_type_id' = 'shot_type_id'
+    final_df = joined_df.join(dimension_shot_type, joined_df['ShotType_id'] == dimension_shot_type['_id'], 'inner')
+
     result_df = (
-        df.filter(col("Shooter").alias("Player") != '')
-        .groupBy("Shooter", "Date", "HomeTeam", "AwayTeam", "Season", "URL")
+        final_df.filter(col("Shooter").alias("Player") != 'null')
+        .groupBy("Shooter", "Date", "Season", "URL", "player_name")
         .agg(
             sum(
-                when((col("ShotType") == 3) & (col("ShotOutcome") == "make"), 3)
-                .when((col("ShotType") == 2) & (col("ShotOutcome") == "make"), 2)
+                when((col("shot_worth") == 3) & (col("ShotOutcome") == "make"), 3)
+                .when((col("shot_worth") == 2) & (col("ShotOutcome") == "make"), 2)
                 .otherwise(0)
             ).alias("Points"),
             sum(
-                when((col("ShotType") == 3) & (col("ShotOutcome") == "make"), 1)
+                when((col("shot_worth") == 3) & (col("ShotOutcome") == "make"), 1)
                 .otherwise(0)
             ).alias("ThreePointersMade"),
             sum(
-                when(col("ShotType") == 3, 1)
+                when(col("shot_worth") == 3, 1)
                 .otherwise(0)
             ).alias("ThreePointersShot"),
             sum(
-                when((col("ShotType") == 2) & (col("ShotOutcome") == "make"), 1)
+                when((col("shot_worth") == 2) & (col("ShotOutcome") == "make"), 1)
                 .otherwise(0)
             ).alias("TwoPointersMade"),
             sum(
-                when(col("ShotType") == 2, 1)
+                when(col("shot_worth") == 2, 1)
                 .otherwise(0)
             ).alias("TwoPointersShot"),
         )
         .withColumn("ThreePointPercentage", col("ThreePointersMade") / col("ThreePointersShot"))
         .withColumn("TwoPointPercentage", col("TwoPointersMade") / col("TwoPointersShot"))
+        .withColumn("Shooter", col("player_name"))
+        .drop("player_name")
+        .drop("_id")
         .orderBy(col("Points").desc())
     )
-    write_to_db(result_df, "nba_test_core", "points_per_player3")
-    df = read_from_db(job.spark,"nba_test_core", "points_per_player3")
-    df.show()
+    result_df.show()    
+    write_to_db(result_df, "nba_test_core", "points_per_player4", "overwrite")
+    df = read_from_db(job.spark,"nba_test_core", "points_per_player4")
+    df.show(truncate=False)
 
 
 points_per_player()

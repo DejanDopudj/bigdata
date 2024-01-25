@@ -25,7 +25,7 @@ def staging_ingest(date):
         result_df = (
             raw_data.filter((col("Date") == date))
             .drop("Time")
-            .withColumn("ShotType", regexp_extract(col("ShotType"), r"(\d+)", 1))
+            # .withColumn("ShotType", regexp_extract(col("ShotType"), r"(\d+)", 1))
             .withColumn(
                 "Season",
                 concat_ws(

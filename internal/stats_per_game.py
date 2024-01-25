@@ -33,7 +33,8 @@ def points_per_game():
             avg("assists").alias("avg_assists")
         )
     )
-    final_df = result_df.select(col("Shooter").alias("Player"), col("Date"), col("HomeTeam"), col("AwayTeam"), col("Season"))
+    final_df = result_df.select(col("Shooter").alias("Player"), col("Date"), col("HomeTeam"), col("AwayTeam"), col("Season"), col("avg_points"), col("avg_defensive_rebounds")
+                                , col("avg_offensive_rebounds"), col("avg_assists"))
     write_to_db(final_df, "nba_test_core", "stats_per_game")
     result_df.show()
 

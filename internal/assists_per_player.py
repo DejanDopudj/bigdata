@@ -22,17 +22,22 @@ def points_per_player():
     df = read_from_db(job.spark,"nba_test_core", "points_per_player")
     df.show()
     # drop_partition(job.spark,"nba_test_core", "points_per_player")
-    df = read_from_db(job.spark, "nba_test_staging", "play_by_play")
+    df = read_from_db(job.spark, "nba_test_fact", "play_by_play")
+    dimension_player = read_from_db(job.spark, "nba_test_fact", "dimension_player")
+    joined_df = df.join(dimension_player, df['Assister'] == dimension_player['player_id'], 'inner')
+
     result_df = (
-        df.filter(col("Assister").alias("Player") != '')
-        .groupBy("Assister", "Date", "HomeTeam", "AwayTeam", "Season", "URL")
+        joined_df.filter(col("Assister").alias("Player") != '')
+        .groupBy("Assister", "Date", "Season", "URL", "Player_name")
         .agg(
             sum(when(col("Assister") != '', 1).otherwise(0)).alias("assists")
         )
         .orderBy(col("assists").desc())
+        .withColumn("Assister", col("player_name"))
+        .drop("player_name")
     )
     result_df.show()
-    write_to_db(result_df, "nba_test_core", "assists_per_player3")
+    write_to_db(result_df, "nba_test_core", "assists_per_player3", "overwrite")
     df = read_from_db(job.spark,"nba_test_core", "assists_per_player3")
     df.show()
 

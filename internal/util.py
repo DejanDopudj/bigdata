@@ -1,6 +1,7 @@
 
 from datetime import datetime
 from pyspark.sql.types import StructType, StructField, StringType
+import time 
 
 def read_from_db(spark, database, collection):
     return (
@@ -10,8 +11,8 @@ def read_from_db(spark, database, collection):
         .load()
     )
 
-def write_to_db(df, database, collection):
-    df.write.format("mongodb").mode("append").option("database", database).option(
+def write_to_db(df, database, collection, mode = "append"):
+    df.write.format("mongodb").mode(mode).option("database", database).option(
         "collection", collection
     ).partitionBy(
             "Season", "Date"
@@ -20,8 +21,8 @@ def write_to_db(df, database, collection):
 def write_stream_to_db(df, database, collection, checkpoint):
     query = df.writeStream.format("mongodb").outputMode("append").option("database", database).option(
         "collection", collection
-).option("checkpointLocation", f"{checkpoint}").trigger(once=True).start()
-    query.awaitTermination()
+).option("checkpointLocation", f"{checkpoint}").trigger(availableNow=True)
+    query.start()
 
 
 schema = StructType([
