@@ -29,7 +29,7 @@ with DAG(
         task_id='end'
 )
     staging_ingestion = SparkSubmitOperator(
-        task_id='test',
+        task_id='staging_ingestion',
         conn_id="spark_default",
         application='/user/local/spark/app/staging_ingest.py',
         conf={"spark.master":spark_master},

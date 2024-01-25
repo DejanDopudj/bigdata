@@ -22,8 +22,8 @@ with DAG(
     end_task = EmptyOperator(
         task_id='end'
 )
-    testtt = SparkSubmitOperator(
-        task_id='test',
+    raw_ingestion = SparkSubmitOperator(
+        task_id='raw_ingestion',
         conn_id="spark_default",
         application='/user/local/spark/app/kafka_read.py',
         application_args=['{{ data_interval_end }}'],  # Pass the execution date as an argument
@@ -32,4 +32,4 @@ with DAG(
     )
     
 
-start_task >> testtt >> end_task
+start_task >> raw_ingestion >> end_task

@@ -12,7 +12,7 @@ jar2 = '/usr/local/spark/resources/spark-avro_2.12-3.3.0.jar'
 jar3 = '/usr/local/spark/resources/spark-sql-kafka-0-10_2.12-3.3.0.jar'
 
 with DAG(
-    dag_id='raw_ingestion_dag',
+    dag_id='staging_ingestion_streaming_dag',
     start_date=datetime(2022, 5, 28),
     schedule_interval= dt.timedelta(minutes=400000)
 ) as dag:
@@ -22,14 +22,14 @@ with DAG(
     end_task = EmptyOperator(
         task_id='end'
 )
-    raw_ingestion = SparkSubmitOperator(
-        task_id='raw_ingestion',
+    staging_ingestion = SparkSubmitOperator(
+        task_id='staging_ingestion',
         conn_id="spark_default",
-        application='/user/local/spark/app/daily_ingest.py',
+        application='/user/local/spark/app/staging_stream_ingest.py',
         application_args=['{{ data_interval_end }}'],  # Pass the execution date as an argument
         conf={"spark.master":spark_master},
-        jars=jar1+","+jar2+","+jar3,
+        packages="org.mongodb.spark:mongo-spark-connector_2.12:10.2.1,org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0,org.apache.spark:spark-avro_2.12:3.3.0",
     )
     
 
-start_task >> raw_ingestion >> end_task
+start_task >> staging_ingestion >> end_task

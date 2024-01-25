@@ -14,7 +14,7 @@ from pyspark.sql.functions import (
 )
 import csv
 from spark import BatchJob
-from util import read_from_db, write_to_db, convert_to_date
+from util import read_from_db, write_to_db, convert_to_date, write_stream_to_db, read_stream_from_db
 from airflow.operators.python import get_current_context
 import sys
 from pyspark.sql.types import StructType, StructField, StringType
@@ -49,6 +49,19 @@ def kafka_read(ds):
         .start()
 
     query.awaitTermination()
+
+    # write_stream_to_db(df,"nba_test","test","hdfs://namenode:9000/checkpoint12345")
+
+    # new_df = read_stream_from_db(job.spark,"nba_test","test")
+
+    # print("AAAAAAAA")
+    # query = new_df.selectExpr("*") \
+    #     .writeStream \
+    #     .format("console") \
+    #     .option("checkpointLocation", "hdfs://namenode:9000/checkpoint32345") \
+    #     .start()
+    # print("AAAAAAAA")
+
  
 execution_date = sys.argv[1]
 kafka_read(execution_date)

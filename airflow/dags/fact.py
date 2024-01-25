@@ -51,7 +51,7 @@ with DAG(
         jars=jar1+","+jar2+","+jar3,
     )
     stats_per_game = SparkSubmitOperator(
-        task_id='points_per_game',
+        task_id='stats_per_game',
         conn_id="spark_default",
         application='/user/local/spark/app/stats_per_game.py',
         conf={"spark.master":spark_master},
