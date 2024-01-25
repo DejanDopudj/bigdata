@@ -24,19 +24,37 @@ def points_per_player():
     # drop_partition(job.spark,"nba_test_core", "points_per_player")
     df = read_from_db(job.spark, "nba_test_staging", "play_by_play")
     result_df = (
-        df.filter(col("Shooter") != '')
-        .groupBy("Shooter", "Date", "HomeTeam", "AwayTeam", "Season")
+        df.filter(col("Shooter").alias("Player") != '')
+        .groupBy("Shooter", "Date", "HomeTeam", "AwayTeam", "Season", "URL")
         .agg(
             sum(
                 when((col("ShotType") == 3) & (col("ShotOutcome") == "make"), 3)
                 .when((col("ShotType") == 2) & (col("ShotOutcome") == "make"), 2)
                 .otherwise(0)
-            ).alias("Points")
+            ).alias("Points"),
+            sum(
+                when((col("ShotType") == 3) & (col("ShotOutcome") == "make"), 1)
+                .otherwise(0)
+            ).alias("ThreePointersMade"),
+            sum(
+                when(col("ShotType") == 3, 1)
+                .otherwise(0)
+            ).alias("ThreePointersShot"),
+            sum(
+                when((col("ShotType") == 2) & (col("ShotOutcome") == "make"), 1)
+                .otherwise(0)
+            ).alias("TwoPointersMade"),
+            sum(
+                when(col("ShotType") == 2, 1)
+                .otherwise(0)
+            ).alias("TwoPointersShot"),
         )
+        .withColumn("ThreePointPercentage", col("ThreePointersMade") / col("ThreePointersShot"))
+        .withColumn("TwoPointPercentage", col("TwoPointersMade") / col("TwoPointersShot"))
         .orderBy(col("Points").desc())
     )
-    write_to_db(result_df, "nba_test_core", "points_per_player")
-    df = read_from_db(job.spark,"nba_test_core", "points_per_player")
+    write_to_db(result_df, "nba_test_core", "points_per_player3")
+    df = read_from_db(job.spark,"nba_test_core", "points_per_player3")
     df.show()
 
 

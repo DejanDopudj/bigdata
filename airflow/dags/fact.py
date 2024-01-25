@@ -36,11 +36,24 @@ with DAG(
         conf={"spark.master":spark_master},
         jars=jar1+","+jar2+","+jar3,
     )
-    
-    points_per_game = SparkSubmitOperator(
+    rebounds_per_player = SparkSubmitOperator(
+        task_id='rebounds_per_player',
+        conn_id="spark_default",
+        application='/user/local/spark/app/rebounds_per_player.py',
+        conf={"spark.master":spark_master},
+        jars=jar1+","+jar2+","+jar3,
+    )
+    assists_per_player = SparkSubmitOperator(
+        task_id='assists_per_player',
+        conn_id="spark_default",
+        application='/user/local/spark/app/assists_per_player.py',
+        conf={"spark.master":spark_master},
+        jars=jar1+","+jar2+","+jar3,
+    )
+    stats_per_game = SparkSubmitOperator(
         task_id='points_per_game',
         conn_id="spark_default",
-        application='/user/local/spark/app/points_per_game.py',
+        application='/user/local/spark/app/stats_per_game.py',
         conf={"spark.master":spark_master},
         jars=jar1+","+jar2+","+jar3,
     )
@@ -81,6 +94,6 @@ with DAG(
     )
     
 
-wait_for_raw_ingestion >> [start_task >> points_per_player >> points_per_game >> 
+wait_for_raw_ingestion >> [start_task >> points_per_player >> rebounds_per_player >> assists_per_player >> stats_per_game >> 
                            first_points_per_game >> percentage_of_points_per_quarter_per_team_per_game >>
                              scores >> seasonal_points_per_quarter >>  steals_between_players >> end_task]
