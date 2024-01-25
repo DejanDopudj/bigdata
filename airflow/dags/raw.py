@@ -22,7 +22,7 @@ with DAG(
     end_task = EmptyOperator(
         task_id='end'
 )
-    testtt = SparkSubmitOperator(
+    raw_ingestion = SparkSubmitOperator(
         task_id='test',
         conn_id="spark_default",
         application='/user/local/spark/app/daily_ingest.py',
@@ -32,4 +32,4 @@ with DAG(
     )
     
 
-start_task >> testtt >> end_task
+start_task >> raw_ingestion >> end_task

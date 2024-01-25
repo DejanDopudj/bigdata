@@ -28,7 +28,7 @@ with DAG(
     end_task = EmptyOperator(
         task_id='end'
 )
-    testtt = SparkSubmitOperator(
+    staging_ingestion = SparkSubmitOperator(
         task_id='test',
         conn_id="spark_default",
         application='/user/local/spark/app/staging_ingest.py',
@@ -37,4 +37,4 @@ with DAG(
     )
     
 
-wait_for_raw_ingestion >> start_task  >> testtt >> end_task
+wait_for_raw_ingestion >> start_task  >> staging_ingestion >> end_task

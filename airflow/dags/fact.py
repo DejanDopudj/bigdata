@@ -25,15 +25,12 @@ with DAG(
     start_task = EmptyOperator(
         task_id='start'
 )
-    print_hello_world = BashOperator(
-        task_id='print_hello_world',
-        bash_command='echo "HelloWorld!"'
-)
+    
     end_task = EmptyOperator(
         task_id='end'
 )
-    testtt = SparkSubmitOperator(
-        task_id='test',
+    points_per_player = SparkSubmitOperator(
+        task_id='points_per_player',
         conn_id="spark_default",
         application='/user/local/spark/app/points_per_player.py',
         conf={"spark.master":spark_master},
@@ -47,6 +44,43 @@ with DAG(
         conf={"spark.master":spark_master},
         jars=jar1+","+jar2+","+jar3,
     )
+    first_points_per_game = SparkSubmitOperator(
+        task_id='first_points_per_game',
+        conn_id="spark_default",
+        application='/user/local/spark/app/first_points_scored.py',
+        conf={"spark.master":spark_master},
+        jars=jar1+","+jar2+","+jar3,
+    )
+    percentage_of_points_per_quarter_per_team_per_game = SparkSubmitOperator(
+        task_id='percentage_of_points_per_quarter_per_team_per_game',
+        conn_id="spark_default",
+        application='/user/local/spark/app/percentage_of_points.py',
+        conf={"spark.master":spark_master},
+        jars=jar1+","+jar2+","+jar3,
+    )
+    scores = SparkSubmitOperator(
+        task_id='scores',
+        conn_id="spark_default",
+        application='/user/local/spark/app/scores.py',
+        conf={"spark.master":spark_master},
+        jars=jar1+","+jar2+","+jar3,
+    )
+    seasonal_points_per_quarter = SparkSubmitOperator(
+        task_id='seasonal_points_per_quarter',
+        conn_id="spark_default",
+        application='/user/local/spark/app/seasonal_per_quarter.py',
+        conf={"spark.master":spark_master},
+        jars=jar1+","+jar2+","+jar3,
+    )
+    steals_between_players = SparkSubmitOperator(
+        task_id='steals_between_players',
+        conn_id="spark_default",
+        application='/user/local/spark/app/steals_between_players.py',
+        conf={"spark.master":spark_master},
+        jars=jar1+","+jar2+","+jar3,
+    )
     
 
-wait_for_raw_ingestion >> start_task >> print_hello_world >> testtt >> points_per_game >> end_task
+wait_for_raw_ingestion >> [start_task >> points_per_player >> points_per_game >> 
+                           first_points_per_game >> percentage_of_points_per_quarter_per_team_per_game >>
+                             scores >> seasonal_points_per_quarter >>  steals_between_players >> end_task]

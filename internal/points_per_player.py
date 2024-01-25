@@ -24,7 +24,7 @@ def points_per_player():
     # drop_partition(job.spark,"nba_test_core", "points_per_player")
     df = read_from_db(job.spark, "nba_test_staging", "play_by_play")
     result_df = (
-        df.filter(col("Shooter").isNotNull())
+        df.filter(col("Shooter") != '')
         .groupBy("Shooter", "Date", "HomeTeam", "AwayTeam", "Season")
         .agg(
             sum(

@@ -176,7 +176,7 @@ class BatchJob:
             "nba_staging.play_by_play"
         )
         result_df = (
-            df.filter(col("Shooter").isNotNull())
+            df.filter(col("Shooter") != '')
             .groupBy("Shooter", "Date", "HomeTeam", "AwayTeam", "Season")
             .agg(
                 sum(
