@@ -158,6 +158,19 @@ services:
     networks:
       - airflow_network
 
+  jupyter:
+    build: ./jupyter
+    volumes:
+      - ./jupyter/work:/home/jovyan/work
+    ports:
+      - 8888:8888
+    container_name: jupyter
+    environment:
+      JUPYTER_ENABLE_LAB: "yes"
+    command: "start-notebook.sh --NotebookApp.token="
+    networks:
+      - airflow_network
+
   # cloudera:
   #   image: gethue/hue:20201111-135001
   #   container_name: hue

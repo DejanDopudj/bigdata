@@ -12,7 +12,9 @@ def read_from_db(spark, database, collection):
 def write_to_db(df, database, collection):
     df.write.format("mongodb").mode("append").option("database", database).option(
         "collection", collection
-    ).save()
+    ).partitionBy(
+            "Season", "Date"
+        ).save()
 
 def convert_to_date(ds):
     original_datetime = datetime.fromisoformat(ds.rstrip("Z"))
