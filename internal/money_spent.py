@@ -65,7 +65,7 @@ def read_stream(table: str, spark):
     window_spec = window("event_date_time", "15 minutes")
 
     result = (
-        df.filter((col("name") == "product_bought")).groupBy(window_spec)
+        df.filter((col("name") == "bought_product")).groupBy(window_spec)
         .agg(_sum("costInt"))
     )
 

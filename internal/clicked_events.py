@@ -63,7 +63,7 @@ def read_stream(table: str, spark):
     window_spec = window("event_date_time", "15 minutes")
 
     result = (
-        df.filter((col("name") == "product_bought") | (col("name") == "clicked_on_product") )
+        df.filter((col("name") == "bought_product") | (col("name") == "clicked_on_product") )
         .groupBy("name", window_spec)
         .agg(count("*").alias("count"))
     )
