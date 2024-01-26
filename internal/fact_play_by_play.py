@@ -33,19 +33,16 @@ def points_per_player():
     dimension_player_df = read_from_db(job.spark, "nba_test_fact", "dimension_player2")
     dimension_turnover_type_df = read_from_db(job.spark, "nba_test_fact", "dimension_turnover_type")
 
-    # joined_df = df.alias("p").join(dimension_player_df, ((df["Shooter"] == dimension_player_df["player_name"] )
-    #                                                      | (df["Rebounder"] == dimension_player_df["player_name"] )
-    #                                                      | (df["Assister"] == dimension_player_df["player_name"])), "left") \
     team_home_dim = dimension_team_df.withColumnRenamed("team_name", "HomeTeam_dim").withColumnRenamed("_id", "HomeTeam_id")
     team_away_dim = dimension_team_df.withColumnRenamed("team_name", "AwayTeam_dim").withColumnRenamed("_id", "AwayTeam_id")
     shot_type_dim = dimension_shot_type_df.withColumnRenamed("shot_type", "ShotType_dim").withColumnRenamed("_id", "ShotType_id")
     turnover_type_dim = dimension_turnover_type_df.withColumnRenamed("turnover_type_name", "TurnoverType_dim").withColumnRenamed("turnover_type_id", "TurnoverType_id")
 
 
-    # Alias the original DataFrame
+
     df_alias = df.alias("df")
 
-    # Joining with dimension_team to get team IDs
+
     fact_play_df = df_alias.join(team_home_dim, col("df.HomeTeam") == col("HomeTeam_dim"), "left_outer") \
         .drop("HomeTeam_dim") \
         .withColumnRenamed("HomeTeam_id", "HomeTeam_id") \
@@ -60,13 +57,13 @@ def points_per_player():
         .withColumnRenamed("TurnoverType_id", "TurnoverType_id")
 
     fact_play_df = fact_play_df.withColumn("secLeftInt", col("df.SecLeft").cast("int"))
-    # Adding a unique play_id column
+
     fact_play_df = fact_play_df.orderBy([col("URL").asc(), col("quarter").asc(), col("secLeftInt").desc()]).withColumn("play_id", monotonically_increasing_id())
 
     fact_play_df.show()
 
 
-    # Selecting and rearranging columns
+
     fact_play_df = fact_play_df.select(
         "play_id", "df.URL", "df.GameType", "df.Location", "df.Date",
         "df.WinningTeam", "df.Quarter", "df.SecLeft", 

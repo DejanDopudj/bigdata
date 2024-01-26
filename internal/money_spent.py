@@ -1,9 +1,16 @@
-from util import read_from_db, write_to_db, convert_to_date, write_stream_to_db, read_stream_from_db
-from spark import BatchJob
-from pyspark.sql.types import StructType, StructField, StringType
-from pyspark.sql.functions import col, from_json
-from pyspark.sql.types import StringType, StructType
+from pyspark.sql.functions import col
 from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import (
+    col,
+    count,
+    window,
+    sum as _sum
+)
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
+from pyspark.sql.types import TimestampType, IntegerType
+
 
 
 spark: SparkSession = (
@@ -52,22 +59,31 @@ spark: SparkSession = (
 
 def read_stream(table: str, spark):
     df = spark.readStream.format("delta").table(table)
-    return df
+    df = df.withColumn("event_date_time", col("event_date_time").cast(TimestampType()))
+    df = df.withColumn("costInt", col("cost").cast(IntegerType()))
+
+    window_spec = window("event_date_time", "15 minutes")
+
+    result = (
+        df.filter((col("name") == "product_bought")).groupBy(window_spec)
+        .agg(_sum("costInt"))
+    )
+
+    return result
 
 def write_stream(
     df, table: str
 ) -> None:
     df.writeStream.format("delta").outputMode("append").trigger(
         availableNow=True
-    ).option("checkpointLocation", f"hdfs://namenode:9000/user/hive/warehouse2/{table}").toTable(
-        table
+    ).option("checkpointLocation", "hdfs://namenode:9000/user/hive/warehouse2/money_spent").toTable(
+        "money_spent"
     ).awaitTermination()
-    print("Written")
 
 def show(df):
     query = (
         df.writeStream.format("console")
-        .outputMode("update").trigger(
+        .outputMode("complete").trigger(
         availableNow=True)
         .option("truncate", False)
         .start()
@@ -75,9 +91,7 @@ def show(df):
     
     query.awaitTermination()
 
-# spark.sql(f"CREATE SCHEMA IF NOT EXISTS n_staging")
 df = read_stream("n_raw.streaming", spark)
-# df = df.distinct()
-# write_stream(df, "n_staging.streaming")
+# write_stream(df,"money_spent")
 show(df)
 

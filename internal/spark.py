@@ -24,11 +24,11 @@ class BatchJob:
             .config("spark.sql.session.timeZone", "UTC")
             .config(
                 "spark.mongodb.read.connection.uri",
-                "mongodb://@mongo:27017",
+                "mongodb://mongo:27017",
             )
             .config(
                 "spark.mongodb.write.connection.uri",
-                "mongodb://@mongo:27017",
+                "mongodb://mongo:27017",
             )
             .config(
                 "spark.jars.packages",

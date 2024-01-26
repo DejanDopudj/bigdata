@@ -34,11 +34,8 @@ def points_per_player():
         .withColumnRenamed("TurnoverType", "turnover_type_name")
     )
 
-    # Add a unique turnover_type_id column
     result_df = dimension_turnover_type_df.withColumn("turnover_type_id", col("turnover_type_name"))
 
-    # Show the result
-    # result_df.show(truncate=False)
     write_to_db(result_df, "nba_test_fact", "dimension_turnover_type", "overwrite")
     df = read_from_db(job.spark,"nba_test_fact", "dimension_turnover_type")
     df.show(truncate=False)

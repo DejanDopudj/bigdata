@@ -1,9 +1,13 @@
-from util import read_from_db, write_to_db, convert_to_date, write_stream_to_db, read_stream_from_db
-from spark import BatchJob
-from pyspark.sql.types import StructType, StructField, StringType
-from pyspark.sql.functions import col, from_json
-from pyspark.sql.types import StringType, StructType
+from pyspark.sql.functions import col
 from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import (
+    col,
+    count,
+    window
+)
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
 
 
 spark: SparkSession = (
@@ -52,7 +56,11 @@ spark: SparkSession = (
 
 def read_stream(table: str, spark):
     df = spark.readStream.format("delta").table(table)
-    return df
+
+    result_df = df.select(col("session_id"),col("name"), col("event_date_time"))\
+       .filter((col("name") == "session_ended") | (col("name") == "session_started"))
+
+    return result_df
 
 def write_stream(
     df, table: str
@@ -60,24 +68,22 @@ def write_stream(
     df.writeStream.format("delta").outputMode("append").trigger(
         availableNow=True
     ).option("checkpointLocation", f"hdfs://namenode:9000/user/hive/warehouse2/{table}").toTable(
-        table
+        "session_data"
     ).awaitTermination()
-    print("Written")
 
 def show(df):
     query = (
         df.writeStream.format("console")
         .outputMode("update").trigger(
         availableNow=True)
+        .option("checkpointLocation", f"hdfs://namenode:9000/user/hive/warehouse2/12345")
         .option("truncate", False)
         .start()
     )
     
     query.awaitTermination()
 
-# spark.sql(f"CREATE SCHEMA IF NOT EXISTS n_staging")
 df = read_stream("n_raw.streaming", spark)
-# df = df.distinct()
-# write_stream(df, "n_staging.streaming")
+# write_stream(df)
 show(df)
 

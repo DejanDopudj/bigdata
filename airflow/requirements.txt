@@ -5,3 +5,4 @@ pyspark == 3.3.0
 apache-airflow-providers-apache-spark == 4.1.0
 apache-airflow-providers-mongo==3.0.0
 apache-airflow-providers-apache-kafka==1.0.0
+delta-spark==2.2.0

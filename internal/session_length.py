@@ -1,9 +1,14 @@
-from util import read_from_db, write_to_db, convert_to_date, write_stream_to_db, read_stream_from_db
-from spark import BatchJob
-from pyspark.sql.types import StructType, StructField, StringType
-from pyspark.sql.functions import col, from_json
-from pyspark.sql.types import StringType, StructType
+from pyspark.sql.functions import col
 from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import (
+    col,
+    count,
+    window,
+    unix_timestamp
+)
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
 
 
 spark: SparkSession = (
@@ -52,7 +57,11 @@ spark: SparkSession = (
 
 def read_stream(table: str, spark):
     df = spark.readStream.format("delta").table(table)
-    return df
+    df2 = df
+
+    ret = df2.join(df, df["session_id"] == df2["session_id"], "inner")
+
+    return ret
 
 def write_stream(
     df, table: str
@@ -60,14 +69,13 @@ def write_stream(
     df.writeStream.format("delta").outputMode("append").trigger(
         availableNow=True
     ).option("checkpointLocation", f"hdfs://namenode:9000/user/hive/warehouse2/{table}").toTable(
-        table
+        "session_data"
     ).awaitTermination()
-    print("Written")
 
 def show(df):
     query = (
         df.writeStream.format("console")
-        .outputMode("update").trigger(
+        .outputMode("append").trigger(
         availableNow=True)
         .option("truncate", False)
         .start()
@@ -75,9 +83,7 @@ def show(df):
     
     query.awaitTermination()
 
-# spark.sql(f"CREATE SCHEMA IF NOT EXISTS n_staging")
-df = read_stream("n_raw.streaming", spark)
-# df = df.distinct()
-# write_stream(df, "n_staging.streaming")
+df = read_stream("raw.streaming_v2", spark)
+# write_stream(df)
 show(df)
 

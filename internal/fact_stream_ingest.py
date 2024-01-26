@@ -62,22 +62,9 @@ def write_stream(
     ).option("checkpointLocation", f"hdfs://namenode:9000/user/hive/warehouse2/{table}").toTable(
         table
     ).awaitTermination()
-    print("Written")
 
-def show(df):
-    query = (
-        df.writeStream.format("console")
-        .outputMode("update").trigger(
-        availableNow=True)
-        .option("truncate", False)
-        .start()
-    )
-    
-    query.awaitTermination()
-
-# spark.sql(f"CREATE SCHEMA IF NOT EXISTS n_staging")
-df = read_stream("n_raw.streaming", spark)
-# df = df.distinct()
-# write_stream(df, "n_staging.streaming")
-show(df)
+spark.sql(f"CREATE SCHEMA IF NOT EXISTS fact")
+df = read_stream("staging.streaming", spark)
+write_stream(df, "fact.streaming")
+# show(df)
 

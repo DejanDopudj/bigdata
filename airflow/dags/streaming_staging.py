@@ -28,7 +28,7 @@ with DAG(
         application='/user/local/spark/app/staging_stream_ingest.py',
         application_args=['{{ data_interval_end }}'],  # Pass the execution date as an argument
         conf={"spark.master":spark_master},
-        packages="org.mongodb.spark:mongo-spark-connector_2.12:10.2.1,org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0,org.apache.spark:spark-avro_2.12:3.3.0",
+        packages="io.delta:delta-core_2.12:2.2.0,org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0,org.apache.spark:spark-avro_2.12:3.3.0",
     )
     
 
