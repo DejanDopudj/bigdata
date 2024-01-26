@@ -9,9 +9,7 @@ from pyspark.sql.functions import (
 )
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
-from pyspark.sql.types import TimestampType, IntegerType
-
-
+from util import read_from_db
 
 spark: SparkSession = (
     SparkSession.builder.master("spark://spark-master:7077")
@@ -59,32 +57,31 @@ spark: SparkSession = (
 
 def read_stream(table: str, spark):
     df = spark.readStream.format("delta").table(table)
-    df = df.withColumn("event_date_time", col("event_date_time").cast(TimestampType()))
-    df = df.withColumn("costInt", col("cost").cast(IntegerType()))
+    
 
-    window_spec = window("event_date_time", "15 minutes")
+    result = result.withColumn("Date", col("Date").cast("timestamp"))
 
-    result = (
-        df.filter((col("name") == "product_bought")).groupBy(window_spec)
-        .agg(_sum("costInt"))
-    )
+    # Define the window specification for the last 24 hours
+    window_spec = window("Date", "24 hours")
+    result_grouped = result.groupBy("player_name", "Points", window_spec)\
+                      .agg(_sum("price").alias("Total_Price"))
 
-    return result
+
+    return result_grouped
 
 def write_stream(
     df, table: str
 ) -> None:
     df.writeStream.format("delta").outputMode("append").trigger(
         availableNow=True
-    ).option("checkpointLocation", "hdfs://namenode:9000/user/hive/warehouse2/money_spent").toTable(
-        "money_spent"
+    ).option("checkpointLocation", f"hdfs://namenode:9000/user/hive/warehouse2/{table}").toTable(
+        table
     ).awaitTermination()
 
 def show(df):
     query = (
         df.writeStream.format("console")
-        .outputMode("complete").trigger(
-        availableNow=True)
+        .outputMode("complete")
         .option("truncate", False)
         .start()
     )
@@ -92,6 +89,6 @@ def show(df):
     query.awaitTermination()
 
 df = read_stream("n_raw.streaming", spark)
-write_stream(df,"money_spent")
+write_stream(df, "player_points_per_cost")
 # show(df)
 

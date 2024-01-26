@@ -91,6 +91,6 @@ def show(df):
     query.awaitTermination()
 
 df = read_stream("n_raw.streaming", spark)
-# write_stream(df)
-show(df)
+write_stream(df, "clicked_events")
+# show(df)
 

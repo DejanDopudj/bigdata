@@ -60,7 +60,7 @@ def read_stream(table: str, spark):
     points_per_game = read_from_db(spark,"nba_test_core", "points_per_player3")
 
     result = points_per_game.join(df, points_per_game["Shooter"] == df["player_name"], "inner")\
-        .select("player_name", "Points", "price")
+        .select("player_name", "Points", "price", "Date")
 
     return result
 
@@ -70,7 +70,7 @@ def write_stream(
     df.writeStream.format("delta").outputMode("append").trigger(
         availableNow=True
     ).option("checkpointLocation", f"hdfs://namenode:9000/user/hive/warehouse2/{table}").toTable(
-        "session_data"
+        table
     ).awaitTermination()
 
 def show(df):
@@ -84,6 +84,6 @@ def show(df):
     query.awaitTermination()
 
 df = read_stream("n_raw.streaming", spark)
-# write_stream(df)
-show(df)
+write_stream(df, "points_per_cost")
+# show(df)
 

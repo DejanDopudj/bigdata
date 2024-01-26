@@ -1,22 +1,9 @@
-from pyspark.sql import SparkSession
-from pyspark.sql import Row
 from pyspark.sql.functions import (
     col,
-    regexp_extract,
-    when,
-    sum,
-    concat_ws,
-    year,
-    month,
-    count,
-    avg,
 )
-import csv
 from spark import BatchJob
-from util import read_from_db, write_to_db, convert_to_date
-from airflow.operators.python import get_current_context
+from util import read_from_db, write_to_db
 from pyspark.sql.functions import split
-import sys
 
 def extract_player_info(column, spark):
     split_col = split(column, " - ")
