@@ -48,7 +48,7 @@ def generate_events_for_user(user_id):
         if random.random() <= 0.03:
             event_id += 1
             event_date_time += timedelta(seconds=random.randint(30, 144))
-            cost = random.random(0,50)
+            cost = random.randint(0,50)
             create_event(session_id, "bought_product", event_date_time, country_id, product_id, player_name, cost, user_uuid)
 
     #session_ended_event
